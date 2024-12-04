@@ -11,7 +11,7 @@ This is a FastAPI-based machine learning service for predicting face shapes from
 
 1. Clone the repository
 ```bash
-git clone https://github.com/yourusername/face-shape-prediction-api.git
+git clone https://github.com/HairMuseApp/HairMuse-API.git
 cd face-shape-prediction-api
 ```
 
