@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import tensorflow as tf
 from PIL import Image
 import io
+import json
 
 from app.schemas.prediction import PredictionResponse
 from app.utils.image_processor import prepare_image
@@ -14,8 +15,7 @@ from app.utils.image_processor import prepare_image
 # Create FastAPI app instance
 app = FastAPI(
     title="Face Shape Prediction API",
-    description="API for predicting face shapes from uploaded images",
-    version="1.0.0"
+    description="API for predicting face shapes from uploaded images"
 )
 
 # Add CORS middleware
@@ -28,8 +28,13 @@ app.add_middleware(
 )
 
 # Define class indices
-CLASS_INDICES = {'heart': 0, 'oblong': 1, 'oval': 2, 'round': 3, 'square': 4}
-CLASS_NAMES = {v: k for k, v in CLASS_INDICES.items()}
+current_dir = os.path.dirname(__file__) 
+file_path = os.path.join(current_dir, 'class_indices.json')
+
+with open(file_path, 'r') as f:
+    loaded_class_indices = json.load(f)
+    
+CLASS_NAMES = {v: k for k, v in loaded_class_indices.items()}
 
 # Load the trained model
 MODEL_PATH = os.path.join(os.path.dirname(__file__), 'models', 'best_model.keras')
