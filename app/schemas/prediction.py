@@ -1,4 +1,5 @@
 from pydantic import BaseModel, Field
+from typing import List
 
 class PredictionResponse(BaseModel):
     """
@@ -8,5 +9,9 @@ class PredictionResponse(BaseModel):
         face_shape (str): Predicted face shape
         confidence (float): Confidence of the prediction in percentage
     """
-    face_shape: str = Field(..., description="Predicted face shape")
-    confidence: float = Field(..., description="Confidence of prediction", gt=0, le=100)
+    uploaded_image: str
+    face_shape: str
+    confidence: float
+    description: str
+    tips: List[str]
+    recommendations: List[str]

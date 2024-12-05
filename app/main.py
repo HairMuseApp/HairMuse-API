@@ -1,13 +1,15 @@
 import os
 import numpy as np
-from fastapi import FastAPI, File, UploadFile, HTTPException
-from fastapi.responses import JSONResponse
-from fastapi.middleware.cors import CORSMiddleware
-
 import tensorflow as tf
 from PIL import Image
 import io
 import json
+import random
+import base64
+
+from fastapi import FastAPI, File, UploadFile, HTTPException
+from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.schemas.prediction import PredictionResponse
 from app.utils.image_processor import prepare_image
@@ -69,10 +71,44 @@ async def predict_face_shape(file: UploadFile = File(...)):
         # Get class name and confidence
         class_name = CLASS_NAMES[predicted_class[0]]
         confidence = float(np.max(predictions) * 100)
+
+        # Load details from JSON
+        details_path = os.path.join(current_dir, 'face_shape_details.json')
+        
+        with open(details_path, 'r') as f:
+            face_shape_details = json.load(f)
+        
+        details = face_shape_details.get(class_name, {})
+        description = details.get("description", "No description available")
+        tips = details.get("tips", ["No tips available"])
+        
+        # Get hairstyle recommendations (3 random images)
+        hairstyle_folder = os.path.join(current_dir, 'hairstyle_database', class_name)
+        hairstyle_images = []
+        
+        try:
+            hairstyle_files = os.listdir(hairstyle_folder)
+            hairstyle_images = random.sample(hairstyle_files, 3)  # Take 3 random images
+        except Exception as e:
+            print(f"Error loading hairstyle images: {e}")
+        
+        hairstyle_images_base64 = []
+        for img_file in hairstyle_images:
+            img_path = os.path.join(hairstyle_folder, img_file)
+            with open(img_path, "rb") as img:
+                img_data = img.read()
+                img_base64 = base64.b64encode(img_data).decode('utf-8')
+                hairstyle_images_base64.append(f"data:image/jpeg;base64,{img_base64}")
+        
+        # Construct response
         
         return {
+            "uploaded_image": f"data:image/jpeg;base64,{base64.b64encode(contents).decode('utf-8')}",
             "face_shape": class_name,
-            "confidence": confidence
+            "confidence": confidence,
+            "description": description,
+            "tips": tips,
+            "recommendations": hairstyle_images_base64
         }
     
     except Exception as e:
