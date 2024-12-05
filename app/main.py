@@ -3,6 +3,7 @@ import numpy as np
 from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+import json
 
 import tensorflow as tf
 from PIL import Image
@@ -27,9 +28,14 @@ app.add_middleware(
     allow_headers=["*"],  # Allows all headers
 )
 
-# Define class indices
-CLASS_INDICES = {'heart': 0, 'oblong': 1, 'oval': 2, 'round': 3, 'square': 4}
-CLASS_NAMES = {v: k for k, v in CLASS_INDICES.items()}
+current_dir = os.path.dirname(__file__) 
+file_path = os.path.join(current_dir, 'class_indices.json')
+
+with open(file_path, 'r') as f:
+    loaded_class_indices = json.load(f)
+
+# Convert to class names dictionary
+CLASS_NAMES = {v: k for k, v in loaded_class_indices.items()}
 
 # Load the trained model
 MODEL_PATH = os.path.join(os.path.dirname(__file__), 'models', 'best_model.keras')
