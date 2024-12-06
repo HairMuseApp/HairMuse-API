@@ -1,4 +1,4 @@
-# Face Shape Prediction API Project
+# HairMuse API Project
 
 ## Project Structure
 ```
