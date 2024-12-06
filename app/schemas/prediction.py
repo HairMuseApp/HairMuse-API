@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field
-from typing import List
+from fastapi import UploadFile
+from typing import List, Dict
 
 class PredictionResponse(BaseModel):
     """
@@ -14,4 +15,8 @@ class PredictionResponse(BaseModel):
     confidence: float
     description: str
     tips: List[str]
-    recommendations: List[str]
+    recommendations: List[Dict[str, str]]
+    
+class PredictionRequest(BaseModel):
+    file: UploadFile
+    gender: str = Field(..., pattern="^(male|female)$")

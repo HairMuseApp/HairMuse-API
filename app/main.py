@@ -11,7 +11,7 @@ from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.schemas.prediction import PredictionResponse
+from app.schemas.prediction import PredictionResponse, PredictionRequest
 from app.utils.image_processor import prepare_image
 
 # Create FastAPI app instance
@@ -43,7 +43,7 @@ MODEL_PATH = os.path.join(os.path.dirname(__file__), 'models', 'best_model.keras
 model = tf.keras.models.load_model(MODEL_PATH)
 
 @app.post("/predict", response_model=PredictionResponse)
-async def predict_face_shape(file: UploadFile = File(...)):
+async def predict_face_shape(file: UploadFile = File(...), gender: str = "female"):
     """
     Predict face shape from an uploaded image
     
@@ -54,9 +54,24 @@ async def predict_face_shape(file: UploadFile = File(...)):
     if not file.content_type.startswith('image/'):
         raise HTTPException(status_code=400, detail="File must be an image")
     
+    # Validate gender
+    if gender not in ["male", "female"]:
+        gender = 'female'
+        raise HTTPException(status_code=400, detail="Gender must be 'male' or 'female'")  
+    
     try:
         # Read image file
         contents = await file.read()
+        
+       # Simpan gambar yang di-upload ke folder lokal
+        upload_folder = 'static/images'
+        os.makedirs(upload_folder, exist_ok=True)
+        file_path = os.path.join(upload_folder, "uploaded_image.jpg")
+        
+        with open(file_path, "wb") as f:
+            f.write(contents)
+
+        uploaded_image_url = f"/static/images/uploaded_image.jpg" 
         
         # Open image using Pillow
         image = Image.open(io.BytesIO(contents))
@@ -83,7 +98,7 @@ async def predict_face_shape(file: UploadFile = File(...)):
         tips = details.get("tips", ["No tips available"])
         
         # Get hairstyle recommendations (3 random images)
-        hairstyle_folder = os.path.join(current_dir, 'hairstyle_database', class_name)
+        hairstyle_folder = os.path.join(current_dir, 'hairstyle_database', gender, class_name)
         hairstyle_images = []
         
         try:
@@ -92,25 +107,26 @@ async def predict_face_shape(file: UploadFile = File(...)):
         except Exception as e:
             print(f"Error loading hairstyle images: {e}")
         
-        hairstyle_images_base64 = []
+        # Mengambil rekomendasi potongan rambut dengan URL (bukan base64)
+        hairstyle_images_urls = []
         for img_file in hairstyle_images:
-            img_path = os.path.join(hairstyle_folder, img_file)
-            with open(img_path, "rb") as img:
-                img_data = img.read()
-                img_base64 = base64.b64encode(img_data).decode('utf-8')
-                hairstyle_images_base64.append(f"data:image/jpeg;base64,{img_base64}")
+            img_url = f"/static/hairstyle/{gender}/{class_name}/{img_file}"  # URL lokal
+            hairstyle_images_urls.append({
+                "filename": img_file,
+                "image": img_url
+            })
         
-        # Construct response
-        
+        # After sending the response, remove the temporary uploaded image file
+        os.remove(file_path)
         return {
-            "uploaded_image": f"data:image/jpeg;base64,{base64.b64encode(contents).decode('utf-8')}",
+            "uploaded_image": uploaded_image_url,
             "face_shape": class_name,
             "confidence": confidence,
             "description": description,
             "tips": tips,
-            "recommendations": hairstyle_images_base64
+            "recommendations": hairstyle_images_urls
         }
-    
+        
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
