@@ -31,6 +31,7 @@ app.add_middleware(
     allow_headers=["*"],  # Allows all headers
 )
 
+<<<<<<< HEAD
 """
 Kode untuk upload ke Google cloud storage
 """
@@ -68,6 +69,8 @@ Kode untuk upload ke Google cloud storage
 
 # CLASS_NAMES = {v: k for k, v in loaded_class_indices.items()}
 
+=======
+>>>>>>> 2e778c22d5ff8d6828e691ed7e4540a9e36119eb
 # Define class indices
 current_dir = os.path.dirname(__file__) 
 file_path = os.path.join(current_dir,'utils', 'class_indices.json')
@@ -102,8 +105,13 @@ async def predict_face_shape(file: UploadFile = File(...), gender: str = "female
         # Read image file
         contents = await file.read()
         
+<<<<<<< HEAD
        # Save uploaded image to a local folder
         upload_folder = os.path.join(current_dir, 'static', 'images')
+=======
+       # Simpan gambar yang di-upload ke folder lokal
+        upload_folder = 'static/images'
+>>>>>>> 2e778c22d5ff8d6828e691ed7e4540a9e36119eb
         os.makedirs(upload_folder, exist_ok=True)
         file_path = os.path.join(upload_folder, "uploaded_image.jpg")
         
