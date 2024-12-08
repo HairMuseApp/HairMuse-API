@@ -31,26 +31,23 @@ app.add_middleware(
     allow_headers=["*"],  # Allows all headers
 )
 
-<<<<<<< HEAD
 """
 Kode untuk upload ke Google cloud storage
 """
 
-# # Define GCS bucket and directories
-# BUCKET_NAME = "your-bucket-name"  # Replace with your GCS bucket name
-# MODEL_FILE = "models/best_model.keras"  # Path in bucket
-# CLASS_INDICES_FILE = "utils/class_indices.json"
-# FACE_SHAPE_DETAILS_FILE = "utils/face_shape_details.json"
-# HAIRSTYLE_FOLDER = "hairstyle_database"  # Path in bucket
+# Define GCS bucket and directories
+BUCKET_NAME = "model-capstone-project"  # Replace with your GCS bucket name
+MODEL_FILE = "model-ml/resnet50.json"  # Path in bucket
+HAIRSTYLE_FOLDER = "Database%20Hairstyle"  # Path in bucket
 
-# # Temporary directory for downloaded files
-# TEMP_DIR = "temp_files"
-# os.makedirs(TEMP_DIR, exist_ok=True)
+# Temporary directory for downloaded files
+TEMP_DIR = "temp_files"
+os.makedirs(TEMP_DIR, exist_ok=True)
 
-# # Download model and JSON files
-# model_local_path = os.path.join(TEMP_DIR, "best_model.keras")
-# if not os.path.exists(model_local_path):
-#     download_from_gcs(BUCKET_NAME, MODEL_FILE, model_local_path)
+# Download model and JSON files
+model_local_path = os.path.join(TEMP_DIR, "resnet50.json")
+if not os.path.exists(model_local_path):
+    download_from_gcs(BUCKET_NAME, MODEL_FILE, model_local_path)
 
 # class_indices_local_path = os.path.join(TEMP_DIR, "class_indices.json")
 # if not os.path.exists(class_indices_local_path):
@@ -60,17 +57,15 @@ Kode untuk upload ke Google cloud storage
 # if not os.path.exists(face_shape_details_local_path):
 #     download_from_gcs(BUCKET_NAME, FACE_SHAPE_DETAILS_FILE, face_shape_details_local_path)
 
-# # Load model
-# model = tf.keras.models.load_model(model_local_path)
+# Load model
+model = tf.keras.models.load_model(model_local_path)
 
-# # Load class indices
+# Load class indices
 # with open(class_indices_local_path, 'r') as f:
 #     loaded_class_indices = json.load(f)
 
 # CLASS_NAMES = {v: k for k, v in loaded_class_indices.items()}
 
-=======
->>>>>>> 2e778c22d5ff8d6828e691ed7e4540a9e36119eb
 # Define class indices
 current_dir = os.path.dirname(__file__) 
 file_path = os.path.join(current_dir,'utils', 'class_indices.json')
@@ -80,9 +75,9 @@ with open(file_path, 'r') as f:
     
 CLASS_NAMES = {v: k for k, v in loaded_class_indices.items()}
 
-# Load the trained model
-MODEL_PATH = os.path.join(os.path.dirname(__file__), 'models', 'best_model.keras')
-model = tf.keras.models.load_model(MODEL_PATH)
+# # Load the trained model
+# MODEL_PATH = os.path.join(os.path.dirname(__file__), 'models', 'best_model.keras')
+# model = tf.keras.models.load_model(MODEL_PATH)
 
 @app.post("/predict", response_model=PredictionResponse)
 async def predict_face_shape(file: UploadFile = File(...), gender: str = "female"):
@@ -105,13 +100,8 @@ async def predict_face_shape(file: UploadFile = File(...), gender: str = "female
         # Read image file
         contents = await file.read()
         
-<<<<<<< HEAD
        # Save uploaded image to a local folder
         upload_folder = os.path.join(current_dir, 'static', 'images')
-=======
-       # Simpan gambar yang di-upload ke folder lokal
-        upload_folder = 'static/images'
->>>>>>> 2e778c22d5ff8d6828e691ed7e4540a9e36119eb
         os.makedirs(upload_folder, exist_ok=True)
         file_path = os.path.join(upload_folder, "uploaded_image.jpg")
         
@@ -143,25 +133,31 @@ async def predict_face_shape(file: UploadFile = File(...), gender: str = "female
         details = face_shape_details.get(class_name, {})
         description = details.get("description", "No description available")
         tips = details.get("tips", ["No tips available"])
+
         
-        # Get hairstyle recommendations (3 random images)
-        hairstyle_folder = os.path.join(current_dir, 'hairstyle_database', gender, class_name)
+        # # Get hairstyle recommendations (3 random images)
+        # hairstyle_folder = os.path.join(current_dir, 'hairstyle_database', gender, class_name)
         hairstyle_images = []
         
         try:
-            hairstyle_files = os.listdir(hairstyle_folder)
+            hairstyle_files = os.listdir(HAIRSTYLE_FOLDER)
             hairstyle_images = random.sample(hairstyle_files, 3)  # Take 3 random images
         except Exception as e:
             print(f"Error loading hairstyle images: {e}")
-        
-        # Mengambil rekomendasi potongan rambut dengan URL (bukan base64)
+            
         hairstyle_images_urls = []
         for img_file in hairstyle_images:
-            img_url = f"/static/hairstyle/{gender}/{class_name}/{img_file}"  # URL lokal
-            hairstyle_images_urls.append({
-                "filename": img_file,
-                "image": img_url
-            })
+            img_url = f"https://storage.googleapis.com/model-capstone-project/Database%20Hairstyle/{gender}/{class_name}/{img_file}"
+            hairstyle_images_urls.append({"filename": img_file, "image": img_url})
+        
+        # Mengambil rekomendasi potongan rambut dengan URL (bukan base64)
+        # hairstyle_images_urls = []
+        # for img_file in hairstyle_images:
+        #     img_url = f"/static/hairstyle/{gender}/{class_name}/{img_file}"  # URL lokal
+        #     hairstyle_images_urls.append({
+        #         "filename": img_file,
+        #         "image": img_url
+        #     })
         
         # After sending the response, remove the temporary uploaded image file
         os.remove(file_path)
