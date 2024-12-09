@@ -1,18 +1,14 @@
 # Gunakan base image Python
 FROM python:3.9-slim
 
-# Set environment variables
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
-
 # Buat direktori untuk aplikasi
 WORKDIR /app
 
 # Salin file requirements.txt ke dalam container
-COPY requirements.txt /app/
+COPY requirements.txt requirements.txt
 
 # Install semua dependensi yang diperlukan
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install -r requirements.txt
 
 # Salin semua file aplikasi ke dalam container
 COPY . /app
