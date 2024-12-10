@@ -1,18 +1,33 @@
 import os
 import numpy as np
 import tensorflow as tf
+import tensorflow_io as tfio
 from PIL import Image
 import io
 import json
 import random
-import base64
+<<<<<<< HEAD
+from enum import Enum
+=======
+>>>>>>> c82e84c6c496986f3c35047a1858377031c2672c
+
 
 from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
-from app.schemas.prediction import PredictionResponse
+from app.schemas.prediction import PredictionResponse, PredictionRequest
 from app.utils.image_processor import prepare_image
+<<<<<<< HEAD
+=======
+
+>>>>>>> c82e84c6c496986f3c35047a1858377031c2672c
+
+
+class GenderEnum(str, Enum):
+    MALE = "male"
+    FEMALE = "female"
 
 # Create FastAPI app instance
 app = FastAPI(
@@ -29,21 +44,40 @@ app.add_middleware(
     allow_headers=["*"],  # Allows all headers
 )
 
+
+"""
+Kode untuk upload ke Google cloud storage
+"""
+# Set up the static files path
+static_folder = os.path.join(os.path.dirname(__file__), 'static')
+os.makedirs(static_folder, exist_ok=True)
+app.mount("/static", StaticFiles(directory=static_folder), name="static")
+
+
+# Load model
+<<<<<<< HEAD
+model_local_path = os.path.join("app", "models", "model.keras")
+model = tf.keras.models.load_model(model_local_path, compile=False)
+=======
+model_local_path = 'app\models\model.keras'
+model = tf.keras.models.load_model(model_local_path)
+>>>>>>> c82e84c6c496986f3c35047a1858377031c2672c
+
 # Define class indices
 current_dir = os.path.dirname(__file__) 
-file_path = os.path.join(current_dir, 'class_indices.json')
+file_path = os.path.join(current_dir, 'utils', 'class_indices.json')
 
 with open(file_path, 'r') as f:
     loaded_class_indices = json.load(f)
     
 CLASS_NAMES = {v: k for k, v in loaded_class_indices.items()}
 
-# Load the trained model
-MODEL_PATH = os.path.join(os.path.dirname(__file__), 'models', 'best_model.keras')
-model = tf.keras.models.load_model(MODEL_PATH)
 
 @app.post("/predict", response_model=PredictionResponse)
-async def predict_face_shape(file: UploadFile = File(...)):
+async def predict_face_shape(
+    file: UploadFile = File(...), 
+    gender: GenderEnum = GenderEnum.FEMALE  # Default value
+    ):
     """
     Predict face shape from an uploaded image
     
@@ -54,9 +88,24 @@ async def predict_face_shape(file: UploadFile = File(...)):
     if not file.content_type.startswith('image/'):
         raise HTTPException(status_code=400, detail="File must be an image")
     
+    # Validate gender
+    if gender not in ["male", "female"]:
+        gender = 'female'
+        raise HTTPException(status_code=400, detail="Gender must be 'male' or 'female'")  
+    
     try:
         # Read image file
         contents = await file.read()
+        
+       # Save uploaded image to a local folder
+        upload_folder = os.path.join(current_dir, 'static', 'images')
+        os.makedirs(upload_folder, exist_ok=True)
+        file_path = os.path.join(upload_folder, "uploaded_image.jpg")
+        
+        with open(file_path, "wb") as f:
+            f.write(contents)
+
+        uploaded_image_url = f"/static/images/uploaded_image.jpg" 
         
         # Open image using Pillow
         image = Image.open(io.BytesIO(contents))
@@ -73,7 +122,7 @@ async def predict_face_shape(file: UploadFile = File(...)):
         confidence = float(np.max(predictions) * 100)
 
         # Load details from JSON
-        details_path = os.path.join(current_dir, 'face_shape_details.json')
+        details_path = os.path.join(current_dir, 'utils', 'face_shape_details.json')
         
         with open(details_path, 'r') as f:
             face_shape_details = json.load(f)
@@ -81,36 +130,52 @@ async def predict_face_shape(file: UploadFile = File(...)):
         details = face_shape_details.get(class_name, {})
         description = details.get("description", "No description available")
         tips = details.get("tips", ["No tips available"])
+
         
-        # Get hairstyle recommendations (3 random images)
-        hairstyle_folder = os.path.join(current_dir, 'hairstyle_database', class_name)
-        hairstyle_images = []
+        # # Get hairstyle recommendations (3 random images)
+<<<<<<< HEAD
+        hairstyle_folder = os.path.join(current_dir, 'hairstyle_database', gender.value, class_name)
+=======
+        hairstyle_folder = os.path.join(current_dir, 'hairstyle_database', gender, class_name)
+>>>>>>> c82e84c6c496986f3c35047a1858377031c2672c
         
-        try:
-            hairstyle_files = os.listdir(hairstyle_folder)
-            hairstyle_images = random.sample(hairstyle_files, 3)  # Take 3 random images
-        except Exception as e:
-            print(f"Error loading hairstyle images: {e}")
+        # Ensure the folder exists
+        if not os.path.exists(hairstyle_folder):
+            raise HTTPException(status_code=404, detail=f"Hairstyle folder for {class_name} not found")
+
+        # Get list of hairstyle images in the folder
+        all_images = [f for f in os.listdir(hairstyle_folder) if f.endswith(('.jpg', '.jpeg', '.png'))]
         
-        hairstyle_images_base64 = []
-        for img_file in hairstyle_images:
-            img_path = os.path.join(hairstyle_folder, img_file)
-            with open(img_path, "rb") as img:
-                img_data = img.read()
-                img_base64 = base64.b64encode(img_data).decode('utf-8')
-                hairstyle_images_base64.append(f"data:image/jpeg;base64,{img_base64}")
+        # If there are less than 3 images, return all available images
+        num_images = min(3, len(all_images))
         
-        # Construct response
-        
+        # Select random images
+        selected_images = random.sample(all_images, num_images)
+
+        # Prepare the URLs for the selected images
+        hairstyle_images_urls = []
+        for img_file in selected_images:
+<<<<<<< HEAD
+            img_url = f"/hairstyle_database/{gender.value}/{class_name}/{img_file}"
+=======
+            img_url = f"/hairstyle_database/{gender}/{class_name}/{img_file}"
+>>>>>>> c82e84c6c496986f3c35047a1858377031c2672c
+            hairstyle_images_urls.append({
+                "filename": os.path.basename(img_file),
+                "image": img_url
+            })
+
+        # After sending the response, remove the temporary uploaded image file
+        os.remove(file_path)
         return {
-            "uploaded_image": f"data:image/jpeg;base64,{base64.b64encode(contents).decode('utf-8')}",
+            "uploaded_image": uploaded_image_url,
             "face_shape": class_name,
             "confidence": confidence,
             "description": description,
             "tips": tips,
-            "recommendations": hairstyle_images_base64
+            "recommendations": hairstyle_images_urls
         }
-    
+        
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -123,4 +188,4 @@ async def root():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8080)

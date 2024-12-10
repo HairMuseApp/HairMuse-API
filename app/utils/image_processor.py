@@ -27,6 +27,6 @@ def prepare_image(image: Image.Image, target_size=(224, 224)):
     img_array = np.expand_dims(img_array, axis=0)
     
     # Preprocess using MobileNetV2 preprocessing
-    img_array = tf.keras.applications.mobilenet_v2.preprocess_input(img_array)
+    img_array = tf.keras.applications.resnet50.preprocess_input(img_array)
     
     return img_array
