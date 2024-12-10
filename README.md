@@ -27,7 +27,7 @@ pip install -r requirements.txt
 ```
 
 4. Place your trained model
-- Put your `model.keras` in the `app/models/` directory
+- Put your `best_model.keras` in the `app/models/` directory
 
 ## Running the API
 
@@ -39,8 +39,8 @@ atau
 python -m app.main 
 ```
 
-## API Endpoints : https://hairmuseimg-325820985735.asia-southeast2.run.app/
-
+## API Endpoints
+`https://hairmuseimg-325820985735.asia-southeast2.run.app/`
 - `/predict` [POST]: Upload an image to get face shape prediction
 - `/hairstyles/{gender}/{face_shape}`
 - `/` [GET]: Health check endpoint
