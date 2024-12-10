@@ -158,6 +158,45 @@ async def predict_face_shape(
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+@app.get("/hairstyles/{gender}/{face_shape}")
+async def get_hairstyles(gender: str, face_shape: str):
+    """
+    Retrieve all hairstyle images based on gender and face shape.
+    
+    - gender: "male" or "female"
+    - face_shape: one of ["heart", "oblong", "oval", "round", "square"]
+    """
+    # Validate gender
+    if gender not in ["male", "female"]:
+        raise HTTPException(status_code=400, detail="Gender must be 'male' or 'female'")
+    
+    # Validate face shape
+    valid_face_shapes = ["heart", "oblong", "oval", "round", "square"]
+    if face_shape not in valid_face_shapes:
+        raise HTTPException(status_code=400, detail=f"Invalid face shape. Must be one of {valid_face_shapes}")
+    
+    # Define the folder path
+    current_dir = os.path.dirname(__file__)
+    hairstyle_folder = os.path.join(current_dir, 'hairstyle_database', gender, face_shape)
+    
+    # Check if the folder exists
+    if not os.path.exists(hairstyle_folder):
+        raise HTTPException(status_code=404, detail=f"No images found for {gender} {face_shape}")
+    
+    # List all images in the folder
+    image_files = [f for f in os.listdir(hairstyle_folder) if f.endswith(('.jpg', '.jpeg', '.png'))]
+    if not image_files:
+        raise HTTPException(status_code=404, detail=f"No images found for {gender} {face_shape}")
+    
+    # Generate URLs for all images
+    image_urls = [{"filename": img_file, "url": f"/hairstyle_database/{gender}/{face_shape}/{img_file}"} for img_file in image_files]
+    
+    # Include face shape in the response
+    return {
+        "face_shape": face_shape,
+        "images": image_urls
+    }
 
 @app.get("/")
 async def root():
