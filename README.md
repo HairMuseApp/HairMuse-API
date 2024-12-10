@@ -36,7 +36,9 @@ uvicorn app.main:app --reload
 ```
 
 ## API Endpoints
+https://hairmuseimg-325820985735.asia-southeast2.run.app/
 - `/predict` [POST]: Upload an image to get face shape prediction
+- `/hairstyles/{gender}/{face_shape}`
 - `/` [GET]: Health check endpoint
 
 ## Usage Example
@@ -54,7 +56,7 @@ with open("test_image.jpg", "rb") as image_file:
 
 ## Model Details
 - Predicts face shapes: heart, oblong, oval, round, square
-- Uses MobileNetV2 preprocessing
+- Uses ResNet50 preprocessing
 - Input image size: 224x224 pixels
 
 ## Contributing
