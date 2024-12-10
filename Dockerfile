@@ -11,7 +11,7 @@ COPY requirements.txt requirements.txt
 RUN pip3 install -r requirements.txt
 
 # Salin semua file aplikasi ke dalam container
-COPY . /app
+COPY . . 
 
 # Expose port untuk FastAPI
 EXPOSE 8080
