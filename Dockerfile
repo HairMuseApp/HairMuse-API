@@ -8,7 +8,7 @@ WORKDIR /app
 COPY requirements.txt requirements.txt
 
 # Install semua dependensi yang diperlukan
-RUN pip install -r requirements.txt
+RUN pip3 install -r requirements.txt
 
 # Salin semua file aplikasi ke dalam container
 COPY . /app
@@ -17,4 +17,4 @@ COPY . /app
 EXPOSE 8000
 
 # Jalankan aplikasi FastAPI menggunakan Uvicorn
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8080"]
