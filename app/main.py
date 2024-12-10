@@ -1,7 +1,6 @@
 import os
 import numpy as np
 import tensorflow as tf
-import tensorflow_io as tfio
 from PIL import Image
 import io
 import json
