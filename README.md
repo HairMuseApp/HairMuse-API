@@ -54,7 +54,7 @@ with open("test_image.jpg", "rb") as image_file:
 
 ## Model Details
 - Predicts face shapes: heart, oblong, oval, round, square
-- Uses MobileNetV2 preprocessing
+- Uses Resnet50 preprocessing
 - Input image size: 224x224 pixels
 
 ## Contributing
