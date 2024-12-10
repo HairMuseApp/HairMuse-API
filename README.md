@@ -34,16 +34,16 @@ pip install -r requirements.txt
 ```bash
 uvicorn app.main:app --reload
 
-atau 
+#atau 
 
 python -m app.main 
 ```
 
 ## API Endpoints
 `https://hairmuseimg-325820985735.asia-southeast2.run.app/`
-- `/predict` [POST]: Upload an image to get face shape prediction
-- `/hairstyles/{gender}/{face_shape}`
 - `/` [GET]: Health check endpoint
+- `/hairstyles/{gender}/{face_shape}` [GET]: Getting Images from hairstyle_database
+- `/predict` [POST]: Upload an image to get face shape prediction
 
 ## Usage Example
 You can use tools like curl, Postman, or write a frontend to interact with the API:
@@ -51,7 +51,7 @@ You can use tools like curl, Postman, or write a frontend to interact with the A
 ```python
 import requests
 
-url = "http://localhost:8000/predict"
+url = "http://localhost:8080/predict"
 with open("test_image.jpg", "rb") as image_file:
     files = {"file": image_file}
     response = requests.post(url, files=files)
@@ -62,9 +62,3 @@ with open("test_image.jpg", "rb") as image_file:
 - Predicts face shapes: heart, oblong, oval, round, square
 - Uses ResNet50 preprocessing
 - Input image size: 224x224 pixels
-
-## Contributing
-Please read CONTRIBUTING.md for details on our code of conduct and the process for submitting pull requests.
-
-## License
-This project is licensed under the MIT License - see the LICENSE.md file for details.
