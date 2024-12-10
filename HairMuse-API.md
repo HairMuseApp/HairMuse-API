@@ -19,7 +19,7 @@ HairMuse-API/
 │   │       ├── round/
 │   │       └── square/
 │   ├── models/
-│   │   └── best_model.keras
+│   │   └── model.keras
 │   ├── schemas/
 │   │   └── prediction.py
 │   ├── utils/
