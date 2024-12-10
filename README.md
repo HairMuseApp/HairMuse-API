@@ -36,7 +36,7 @@ uvicorn app.main:app --reload
 ```
 
 ## API Endpoints
-https://hairmuseimg-325820985735.asia-southeast2.run.app/
+`https://hairmuseimg-325820985735.asia-southeast2.run.app/`
 - `/predict` [POST]: Upload an image to get face shape prediction
 - `/hairstyles/{gender}/{face_shape}`
 - `/` [GET]: Health check endpoint
