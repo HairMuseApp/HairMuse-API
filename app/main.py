@@ -1,10 +1,15 @@
 import os
 import numpy as np
 import tensorflow as tf
+import tensorflow_io as tfio
 from PIL import Image
 import io
 import json
 import random
+<<<<<<< HEAD
+from enum import Enum
+=======
+>>>>>>> c82e84c6c496986f3c35047a1858377031c2672c
 
 
 from fastapi import FastAPI, File, UploadFile, HTTPException
@@ -14,8 +19,15 @@ from fastapi.staticfiles import StaticFiles
 
 from app.schemas.prediction import PredictionResponse, PredictionRequest
 from app.utils.image_processor import prepare_image
+<<<<<<< HEAD
+=======
+
+>>>>>>> c82e84c6c496986f3c35047a1858377031c2672c
 
 
+class GenderEnum(str, Enum):
+    MALE = "male"
+    FEMALE = "female"
 
 # Create FastAPI app instance
 app = FastAPI(
@@ -43,8 +55,13 @@ app.mount("/static", StaticFiles(directory=static_folder), name="static")
 
 
 # Load model
+<<<<<<< HEAD
+model_local_path = os.path.join("app", "models", "model.keras")
+model = tf.keras.models.load_model(model_local_path, compile=False)
+=======
 model_local_path = 'app\models\model.keras'
 model = tf.keras.models.load_model(model_local_path)
+>>>>>>> c82e84c6c496986f3c35047a1858377031c2672c
 
 # Define class indices
 current_dir = os.path.dirname(__file__) 
@@ -57,7 +74,10 @@ CLASS_NAMES = {v: k for k, v in loaded_class_indices.items()}
 
 
 @app.post("/predict", response_model=PredictionResponse)
-async def predict_face_shape(file: UploadFile = File(...), gender: str = "female"):
+async def predict_face_shape(
+    file: UploadFile = File(...), 
+    gender: GenderEnum = GenderEnum.FEMALE  # Default value
+    ):
     """
     Predict face shape from an uploaded image
     
@@ -113,7 +133,11 @@ async def predict_face_shape(file: UploadFile = File(...), gender: str = "female
 
         
         # # Get hairstyle recommendations (3 random images)
+<<<<<<< HEAD
+        hairstyle_folder = os.path.join(current_dir, 'hairstyle_database', gender.value, class_name)
+=======
         hairstyle_folder = os.path.join(current_dir, 'hairstyle_database', gender, class_name)
+>>>>>>> c82e84c6c496986f3c35047a1858377031c2672c
         
         # Ensure the folder exists
         if not os.path.exists(hairstyle_folder):
@@ -131,7 +155,11 @@ async def predict_face_shape(file: UploadFile = File(...), gender: str = "female
         # Prepare the URLs for the selected images
         hairstyle_images_urls = []
         for img_file in selected_images:
+<<<<<<< HEAD
+            img_url = f"/hairstyle_database/{gender.value}/{class_name}/{img_file}"
+=======
             img_url = f"/hairstyle_database/{gender}/{class_name}/{img_file}"
+>>>>>>> c82e84c6c496986f3c35047a1858377031c2672c
             hairstyle_images_urls.append({
                 "filename": os.path.basename(img_file),
                 "image": img_url
