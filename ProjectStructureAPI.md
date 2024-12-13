@@ -29,6 +29,7 @@ HairMuse-API/
 │   ├── main.py
 │
 ├── README.md
+├── Dockerfile
 ├── requirements.txt
 └── gitignore-file.txt
 
