@@ -40,7 +40,7 @@ python -m app.main
 ```
 
 ## Google Cloud Architecture
-<img src="Cloud Architecture.png" alt="HairMuse Logo" width="990" height="650">
+<img src="https://github.com/HairMuseApp/.github/blob/main/assets/Cloud-Architecture.jpeg" alt="HairMuse Logo" width="990" height="450">
 
 ## BASE URL: https://hairmuseimg2-325820985735.asia-southeast2.run.app/
 - `/` [GET]: Health check endpoint
