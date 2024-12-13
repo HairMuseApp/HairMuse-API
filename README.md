@@ -27,7 +27,7 @@ pip install -r requirements.txt
 ```
 
 4. Place your trained model
-- Put your `best_model.keras` in the `app/models/` directory
+- Put your `model.keras` in the `app/models/` directory
 
 ## Running the API
 
@@ -39,8 +39,10 @@ uvicorn app.main:app --reload
 python -m app.main 
 ```
 
-## API Endpoints
-`https://hairmuseimg-325820985735.asia-southeast2.run.app/`
+## Google Cloud Architecture
+<img src="Cloud Architecture.png" alt="HairMuse Logo" width="990" height="650">
+
+## BASE URL: https://hairmuseimg2-325820985735.asia-southeast2.run.app/
 - `/` [GET]: Health check endpoint
 - `/hairstyles/{gender}/{face_shape}` [GET]: Getting Images from hairstyle_database
 - `/predict` [POST]: Upload an image to get face shape prediction
